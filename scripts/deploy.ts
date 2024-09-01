@@ -25,6 +25,8 @@ async function main() {
     abi: NFTMarketplaceV2__factory.abi,
   };
 
+  console.log("Marketplace deployed to:", await marketplace.getAddress());
+
   fs.writeFileSync("./src/MarketplaceV2HHTest.json", JSON.stringify(data));
 }
 

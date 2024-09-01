@@ -34,6 +34,14 @@ describe("NFTMarketplaceV2", async function () {
     expect(await contract.tokenURI(1)).to.equal("URI");
   });
 
+  it("should give myNFTs", async function () {
+    const { owner, contract } = await loadFixture(dep);
+    const tx = await contract.createToken("URI", ethers.parseEther("0.01"), 10);
+    await tx.wait();
+    const nfts = await contract.getAllNFTs();
+    console.log("MyNFTs: ", nfts);
+  });
+
   it("Should buy an NFT", async function () {
     const { owner, contract, otherAccount } = await loadFixture(dep);
     const tx = await contract

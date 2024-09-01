@@ -51,6 +51,11 @@ contract NFTMarketplaceV2 is ERC721URIStorage, ReentrancyGuard {
         contractOwner = payable(msg.sender);
     }
 
+    modifier onlyOwner () {
+        require(msg.sender == contractOwner, "Only contract owner can perform this action");
+        _;
+    }
+
     function createToken(string memory tokenURI, uint256 price, uint256 royalty) public returns (uint) {
         require(royalty <= 30, "Royalty cannot exceed 30%");
 
@@ -145,6 +150,28 @@ contract NFTMarketplaceV2 is ERC721URIStorage, ReentrancyGuard {
 
         return allNFTs;
     }
+
+    function getMyNFTs() public view returns (ListedToken[] memory) {
+        uint nftCount = _tokenIds;
+        uint itemCount = 0;
+        uint currentIndex = 0;
+
+
+        for (uint i = 0; i < nftCount; i++) {
+            if (idToListedToken[i + 1].owner == msg.sender) {
+                itemCount++;
+            }
+        }
+        ListedToken[] memory myNFTs = new ListedToken[](itemCount);
+        for (uint i = 0; i < nftCount; i++) {
+            if (idToListedToken[i + 1].owner == msg.sender) {
+                myNFTs[currentIndex] = idToListedToken[i + 1];
+                currentIndex++;
+            }
+        }
+
+        return myNFTs;
+    }
     
     function getListedNFTs() public view returns (ListedToken[] memory) {
         uint nftCount = _tokenIds;
@@ -172,6 +199,10 @@ contract NFTMarketplaceV2 is ERC721URIStorage, ReentrancyGuard {
         return listedTokens;
     }
 
+    function getTokenById(uint256 id) public view returns (ListedToken memory) {
+        return idToListedToken[id];
+    }
+
 
     function getSaleHistory(uint256 tokenId) public view returns (SaleHistory[] memory) {
         return saleHistories[tokenId];
@@ -184,6 +215,10 @@ contract NFTMarketplaceV2 is ERC721URIStorage, ReentrancyGuard {
 
     function getListPrice() public view returns (uint256) {
         return listPrice;
+    }
+
+    function setListPrice(uint _listPrice) external  onlyOwner {
+        listPrice = _listPrice;
     }
 
     function getCurrentToken() public view returns (uint256) {
